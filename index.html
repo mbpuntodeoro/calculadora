@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoría de Fuga Patrimonial - MB Capital</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --primary: #58a6ff;
+            --danger: #f85149;
+            --warning: #f1e05a;
+            --success: #238636;
+            --text: #c9d1d9;
+            --text-dim: #8b949e;
+        }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); padding: 20px; line-height: 1.6; }
+        .container { max-width: 500px; margin: 0 auto; }
+        
+        .hero { text-align: center; padding: 40px 0; }
+        .hero h1 { font-size: 26px; color: #fff; margin-bottom: 10px; line-height: 1.2; }
+        .hero p { color: var(--warning); font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .audit-card { background: var(--surface); border: 1px solid #30363d; border-radius: 12px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+        .field { display: flex; flex-direction: column; gap: 5px; }
+        label { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
+        input { background: #0d1117; border: 1px solid #30363d; color: #fff; padding: 12px; border-radius: 6px; font-size: 14px; }
+        
+        .btn-main { width: 100%; background: var(--primary); color: #fff; border: none; padding: 18px; border-radius: 6px; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 20px; font-size: 13px; }
+        
+        .dashboard { display: none; margin-top: 30px; border-top: 1px solid #30363d; padding-top: 20px; }
+        
+        .total-box { background: rgba(88, 166, 255, 0.08); border: 1px solid var(--primary); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 20px; }
+        .total-box span { display: block; font-size: 11px; font-weight: 800; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; }
+        .total-amount { font-size: 30px; font-weight: 800; color: #fff; font-family: 'Courier New', monospace; }
+
+        .projection-box { background: rgba(248, 81, 73, 0.08); border: 1px solid rgba(248, 81, 73, 0.2); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        .projection-title { font-size: 11px; font-weight: 800; color: var(--warning); display: block; margin-bottom: 15px; text-transform: uppercase; }
+        .projection-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; align-items: center; }
+
+        .business-impact { background: #1c2128; border-left: 4px solid var(--primary); padding: 20px; margin-bottom: 20px; border-radius: 4px; }
+        .business-impact h3 { margin: 0 0 10px 0; font-size: 13px; color: var(--primary); text-transform: uppercase; }
+        .business-impact p { margin: 0; font-size: 14px; color: #fff; font-weight: 700; }
+
+        .mind-break { text-align: center; padding: 20px; font-style: italic; color: var(--warning); font-size: 14px; font-weight: 600; line-height: 1.4; }
+
+        .lead-form { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; border: 1px solid #30363d; margin: 20px 0 10px; }
+        .lead-form h4 { margin: 0 0 15px 0; font-size: 12px; color: var(--primary); text-transform: uppercase; text-align: center; }
+        .lead-form .field { margin-bottom: 10px; }
+
+        .whatsapp-btn { width: 100%; background: var(--success); color: #fff; border: none; padding: 20px; border-radius: 6px; font-weight: 800; cursor: pointer; font-size: 15px; text-transform: uppercase; }
+        .subtext { text-align: center; display: block; font-size: 11px; color: var(--text-dim); margin-top: 10px; font-weight: 700; }
+
+        .footer { text-align: center; font-size: 10px; margin-top: 40px; padding-top: 20px; border-top: 1px solid #30363d; color: var(--text-dim); }
+        .footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <section class="hero">
+        <h1>Estás financiando a tus clientes sin darte cuenta</h1>
+        <p>Tu cliente usa tu plata gratis. Dejá de financiar su negocio.</p>
+    </section>
+
+    <div class="audit-card">
+        <div class="input-grid">
+            <div class="field" style="grid-column: span 2;"><label>Capital Nominal Adeudado (ARS)</label><input type="number" id="monto" placeholder="Ej: 50.000.000"></div>
+            <div class="field"><label>Desde (Vencimiento)</label><input type="date" id="fechaVenc"></div>
+            <div class="field"><label>Hasta (Auditoría)</label><input type="date" id="fechaCorte"></div>
+            <div class="field" style="grid-column: span 2;"><label id="label-tasas">Tasa Nominal (TNA) % BNA</label><input type="number" id="tna" value="68" oninput="updateTeaLabel()"></div>
+        </div>
+        <button class="btn-main" onclick="startAudit()">Auditar mi pérdida ahora</button>
+
+        <div id="dashboard" class="dashboard">
+            <div class="total-box">
+                <span>💸 PLATA QUE YA PERDISTE:</span>
+                <div id="cont-total" class="total-amount"></div>
+            </div>
+
+            <div class="projection-box">
+                <span class="projection-title">🔥 SI NO HACÉS NADA, ESTO SIGUE ESCALANDO:</span>
+                <div class="projection-row"><span>En 30 días habrás perdido:</span><span id="proj-30" style="color:var(--danger); font-weight:700; font-family:monospace;"></span></div>
+                <div class="projection-row"><span>En 60 días habrás perdido:</span><span id="proj-60" style="color:var(--danger); font-weight:700; font-family:monospace;"></span></div>
+                <div class="projection-row"><span>En 90 días habrás perdido:</span><span id="proj-90" style="color:var(--danger); font-weight:700; font-family:monospace;"></span></div>
+                <p style="font-size: 10px; text-align: center; margin-top: 15px; color: var(--text-dim); font-style: italic;">Cada día que no cobrás, financiás a tu cliente con tu plata.</p>
+            </div>
+
+            <div class="business-impact">
+                <h3>Impacto en tu negocio:</h3>
+                <p id="extra-ventas">Cargando análisis de esfuerzo comercial...</p>
+            </div>
+
+            <div class="mind-break">
+                El problema no es la mora.<br>Es capital de trabajo que desaparece de tu patrimonio.
+            </div>
+
+            <div class="lead-form">
+                <h4>Solicitar Ayuda para Cobrar</h4>
+                <div class="field"><label>Nombre y Apellido</label><input type="text" id="lead-nombre" placeholder="Responsable"></div>
+                <div class="field"><label>Empresa</label><input type="text" id="lead-empresa" placeholder="Razón Social"></div>
+                <div class="field"><label>Email Corporativo</label><input type="email" id="lead-email" placeholder="mail@empresa.com"></div>
+            </div>
+
+            <button class="whatsapp-btn" onclick="sendWA()">Ayudame a cobrar esto</button>
+            <span class="subtext">TE RESPONDO EN MENOS DE 1 HORA</span>
+        </div>
+    </div>
+
+    <div class="footer">
+        DESARROLLADO POR <a href="https://www.linkedin.com/in/marianoblumenfeld/" target="_blank">MARIANO BLUMENFELD</a>
+    </div>
+</div>
+
+<script>
+    let timer;
+    let dataInflacionGlobal = [];
+    let ultimaTasaConocida = 0.029;
+    const fmt = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2 });
+
+    window.onload = async function() {
+        document.getElementById('fechaCorte').value = new Date().toISOString().split('T')[0];
+        try {
+            const resI = await fetch('https://api.argentinadatos.com/v1/inflacion');
+            dataInflacionGlobal = await resI.json();
+            if(dataInflacionGlobal.length > 0) ultimaTasaConocida = dataInflacionGlobal[dataInflacionGlobal.length - 1].valor / 100;
+        } catch (e) { console.error("API error"); }
+        updateTeaLabel();
+    };
+
+    function updateTeaLabel() {
+        const tnaVal = parseFloat(document.getElementById('tna').value);
+        if(!isNaN(tnaVal)) {
+            const teaVal = (Math.pow(1 + (tnaVal / 100 / 12), 12) - 1) * 100;
+            document.getElementById('label-tasas').innerHTML = `TNA BNA: ${tnaVal}% | TEA: ${teaVal.toFixed(1)}%`;
+        }
+    }
+
+    function getFactorCompuesto(venc, corte) {
+        const dias = (corte - venc) / 86400000;
+        if (dias <= 0) return 1;
+        let factor = 1;
+        let huboDatos = false;
+        dataInflacionGlobal.forEach(entry => {
+            const fMes = new Date(entry.fecha);
+            if (fMes >= new Date(venc.getFullYear(), venc.getMonth(), 1) && fMes <= new Date(corte.getFullYear(), corte.getMonth(), 1)) {
+                factor *= (1 + (entry.valor / 100));
+                huboDatos = true;
+            }
+        });
+        if (!huboDatos) factor = Math.pow(1 + ultimaTasaConocida, dias / 30);
+        return factor;
+    }
+
+    function startAudit() {
+        const monto = parseFloat(document.getElementById('monto').value);
+        const fV = new Date(document.getElementById('fechaVenc').value);
+        const inputCorte = new Date(document.getElementById('fechaCorte').value);
+        const tna = parseFloat(document.getElementById('tna').value) / 100;
+
+        if(!monto || isNaN(fV.getTime())) return alert("Ingresá monto y fecha de vencimiento");
+        
+        document.getElementById('dashboard').style.display = 'block';
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        clearInterval(timer);
+
+        const baseTime = fV.getTime();
+
+        timer = setInterval(() => {
+            const ahora = new Date();
+            let tiempoRef;
+            // Si la fecha de corte es hoy, usamos streaming real.
+            if (inputCorte.toDateString() === ahora.toDateString()) {
+                tiempoRef = ahora.getTime();
+            } else {
+                // Si es fecha pasada, simulamos el streaming para impacto visual
+                tiempoRef = inputCorte.getTime() + (ahora.getTime() % 10000); 
+            }
+            
+            const diasExactos = (tiempoRef - baseTime) / 86400000;
+            if (diasExactos < 0) return;
+
+            const pFin = monto * (tna / 365) * diasExactos;
+            const factor = getFactorCompuesto(fV, new Date(tiempoRef));
+            const pDev = monto * (factor - 1);
+            const total = pFin + pDev;
+            const costoDiario = total / diasExactos;
+
+            document.getElementById('cont-total').innerText = fmt.format(total);
+            document.getElementById('proj-30').innerText = fmt.format(total + (costoDiario * 30));
+            document.getElementById('proj-60').innerText = fmt.format(total + (costoDiario * 60));
+            document.getElementById('proj-90').innerText = fmt.format(total + (costoDiario * 90));
+            
+            const ventaExtra = total / 0.3; // Margen 30%
+            document.getElementById('extra-ventas').innerText = `Necesitás vender ${fmt.format(ventaExtra)} adicionales solo para empatar esta pérdida.`;
+        }, 50);
+    }
+
+    function sendWA() {
+        const nombre = document.getElementById('lead-nombre').value;
+        const empresa = document.getElementById('lead-empresa').value;
+        const montoVal = fmt.format(document.getElementById('monto').value);
+        const totalPerdida = document.getElementById('cont-total').innerText;
+        
+        if(!nombre || !empresa) return alert("Por favor, completá Nombre y Empresa.");
+
+        const msg = encodeURIComponent(`Hola Mariano, soy ${nombre} de ${empresa}. Mi cliente está usando mi plata gratis. Mi deuda de ${montoVal} ya generó una pérdida acumulada de ${totalPerdida}. Ayudame a cobrar esto.`);
+        window.location.href = `https://wa.me/5491166463800?text=${msg}`;
+    }
+</script>
+</body>
+</html>
