@@ -75,7 +75,7 @@
         .projection-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; align-items: center; font-weight: 500; }
         .proj-number { font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--danger); }
 
-        .business-impact { background: #f8fafc; border-left: 4px solid var(--primary); padding: 16px; margin-bottom: 25px; border-radius: 0 8px 8px 0; border: 1px solid var(--border); border-left: 4px solid var(--primary); text-align: center; }
+        .business-impact { background: #f8fafc; border-left: 4px solid var(--primary); padding: 16px; margin-bottom: 25px; border-radius: 0 8px 8px 0; border: 1px solid var(--border); text-align: center; }
         .business-impact h3 { font-size: 11px; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; }
         .business-impact p { font-size: 14px; color: var(--text); font-weight: 700; line-height: 1.3; }
 
@@ -105,7 +105,7 @@
         <div class="input-grid">
             <div class="field full-width">
                 <label>¿Cuánto te deben? (Facturación ARS)</label>
-                <input type="number" id="monto" placeholder="Ej: 50000000" inputmode="decimal">
+                <input type="text" id="monto" placeholder="$ 50.000.000" inputmode="numeric" oninput="formatearMonto(this)">
             </div>
             <div class="field">
                 <label>¿Cuándo debías cobrar?</label>
@@ -177,13 +177,25 @@
     let timer;
     const fmt = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2 });
 
-    // TU ENDPOINT DE GOOGLE SHEETS INTEGRADO
     const LEAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyov0JcVdRKaCO-FAcv8rMN0iLmwwOzYrVxM-4-n7aiSO_SE8bVstZkDduwrt9yjg-6CQ/exec'; 
 
     window.onload = function() {
         document.getElementById('fechaVenc').value = new Date().toISOString().split('T')[0];
         updateTeaLabel();
     };
+
+    // NUEVA FUNCIÓN: Formatea el input en vivo mientras el usuario escribe
+    function formatearMonto(input) {
+        // Quita todo lo que no sea un número (letras, puntos, signos)
+        let valorRaw = input.value.replace(/\D/g, "");
+        
+        if (valorRaw === "") {
+            input.value = "";
+            return;
+        }
+        // Formatea con puntos y le agrega el signo pesos
+        input.value = "$ " + new Intl.NumberFormat('es-AR').format(parseInt(valorRaw, 10));
+    }
 
     function updateTeaLabel() {
         const tnaVal = parseFloat(document.getElementById('tna').value);
@@ -194,7 +206,10 @@
     }
 
     function startAudit() {
-        const monto = parseFloat(document.getElementById('monto').value);
+        // LIMPIAMOS EL MONTO ANTES DE CALCULAR: Le sacamos el "$" y los puntos
+        const montoRaw = document.getElementById('monto').value.replace(/\D/g, "");
+        const monto = parseFloat(montoRaw);
+        
         const fV = new Date(document.getElementById('fechaVenc').value);
         const tna = parseFloat(document.getElementById('tna').value) / 100;
         const margen = parseFloat(document.getElementById('margen').value) / 100;
@@ -255,15 +270,17 @@
         const email = document.getElementById('lead-email').value;
         const totalPerdida = document.getElementById('cont-total').innerText;
         const scoreTexto = document.getElementById('diag-score').innerText.replace('Urgencia: ', '');
-        const montoVal = fmt.format(document.getElementById('monto').value);
+        
+        // LIMPIAMOS EL MONTO PARA MANDARLO A GOOGLE SHEETS
+        const montoRaw = document.getElementById('monto').value.replace(/\D/g, "");
+        const montoVal = fmt.format(parseFloat(montoRaw) || 0);
 
         if(!nombre || !email) return alert("Por favor, completá tu nombre y mail para contactarte.");
 
-        // ENVÍO DE DATOS A GOOGLE SHEETS
         try {
             fetch(LEAD_ENDPOINT, {
                 method: 'POST',
-                mode: 'no-cors', // Importante para Google Apps Script
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     nombre: nombre, 
