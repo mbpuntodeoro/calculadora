@@ -43,10 +43,9 @@
         .field { display: flex; flex-direction: column; gap: 6px; width: 100%; }
         label { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
         
-        /* ACÁ ESTÁ EL CAMBIO DE FUENTES UNIFICADAS */
         input { 
-            font-family: inherit; 
-            font-size: 16px; 
+            font-family: inherit;
+            font-size: 16px;
             font-weight: 500;
             background: #ffffff; 
             border: 1px solid #d1d5db; 
@@ -59,12 +58,6 @@
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
         input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
-        
-        /* Ajuste para que el ícono del calendario se vea bien */
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            opacity: 0.6;
-            cursor: pointer;
-        }
 
         .btn-main { 
             width: 100%; background: var(--primary); color: #fff; border: none; padding: 16px; 
@@ -80,6 +73,12 @@
         .total-box span { display: block; font-size: 10px; font-weight: 800; color: #1e3a8a; margin-bottom: 5px; }
         .total-amount { font-size: 28px; font-weight: 800; color: var(--primary); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-variant-numeric: tabular-nums; word-break: break-all; }
 
+        /* NUEVOS ESTILOS: URGENCY BOX */
+        .urgency-box { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: center; }
+        .urgency-days { font-size: 14px; font-weight: 700; color: #9a3412; margin-bottom: 6px; }
+        .urgency-daily { font-size: 20px; font-weight: 800; color: #dc2626; margin-bottom: 8px; font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+        .urgency-msg { font-size: 13px; color: #374151; font-weight: 500; font-style: italic; }
+
         .diagnostic-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: center; }
         .diag-title { font-size: 10px; color: var(--text-dim); text-transform: uppercase; font-weight: 800; margin-bottom: 8px; }
         .diag-score { font-size: 18px; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; }
@@ -94,10 +93,6 @@
         .business-impact { background: #f8fafc; border-left: 4px solid var(--primary); padding: 16px; margin-bottom: 25px; border-radius: 0 8px 8px 0; border: 1px solid var(--border); text-align: center; }
         .business-impact h3 { font-size: 11px; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; }
         .business-impact p { font-size: 14px; color: var(--text); font-weight: 700; line-height: 1.3; }
-
-        .mind-break-container { margin: 25px 0; padding: 20px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); text-align: center; background: #ffffff; }
-        .mind-break-text { color: #111827; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-        .mind-break-sub { color: var(--text-dim); font-size: 13px; font-weight: 500; }
 
         .lead-form { background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 16px; }
         .lead-form h4 { font-size: 11px; color: var(--primary); text-transform: uppercase; text-align: center; margin-bottom: 16px; }
@@ -132,7 +127,7 @@
                 <input type="number" id="margen" value="20" inputmode="decimal">
             </div>
             <div class="field full-width">
-                <label id="label-tasas">CFT % BNA (Costo Fin. Total)</label>
+                <label id="label-tasas">Descubiertos en cta. cte. (CFT)</label>
                 <input type="number" id="tna" value="94.42" oninput="updateTeaLabel()" inputmode="decimal">
             </div>
         </div>
@@ -143,6 +138,15 @@
             <div class="total-box">
                 <span>💸 Costo Financiero Absorbido:</span>
                 <div id="cont-total" class="total-amount"></div>
+                <div style="font-size:10px; color:#6b7280; margin-top:8px;">
+                    Cálculo en interés simple para estimación conservadora del costo financiero.
+                </div>
+            </div>
+
+            <div class="urgency-box">
+                <div id="dias-transcurridos" class="urgency-days"></div>
+                <div id="perdida-diaria" class="urgency-daily"></div>
+                <div id="mensaje-urgencia" class="urgency-msg"></div>
             </div>
 
             <div class="diagnostic-box">
@@ -165,13 +169,8 @@
                 <div id="explicacion-impacto" style="font-size: 11px; color: var(--text-dim); margin-top: 8px; font-weight: 500;"></div>
             </div>
 
-            <div class="mind-break-container">
-                <div class="mind-break-text">El problema no es la mora.</div>
-                <div class="mind-break-sub">Es capital de trabajo que desaparece de tu patrimonio.</div>
-            </div>
-
             <div class="lead-form">
-                <h4>Solicitar asesoría gratuita</h4>
+                <h4>Diseñar Plan de Recupero</h4>
                 <div class="field" style="margin-bottom:12px;"><label>Nombre</label><input type="text" id="lead-nombre" placeholder="Responsable"></div>
                 <div class="field"><label>Tu email</label><input type="email" id="lead-email" placeholder="mail@ejemplo.com"></div>
             </div>
@@ -179,7 +178,7 @@
             <button id="btn-accion" class="whatsapp-btn" onclick="sendWA()">Ayudame a cobrar esto</button>
 
             <div class="disclaimer">
-                Cálculo basado en tasa activa bancaria (CFT) sobre saldos vencidos.<br>No incluye costos de gestión, legales ni punitorios adicionales.
+                Cálculo referencial basado en la TNA activa del BNA para Desc. en Cta. Cte.<br>No incluye costos de gestión, legales, ni el impacto impositivo del C.F.T.
             </div>
         </div>
     </div>
@@ -192,7 +191,6 @@
 <script>
     let timer;
     const fmt = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2 });
-
     const LEAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyov0JcVdRKaCO-FAcv8rMN0iLmwwOzYrVxM-4-n7aiSO_SE8bVstZkDduwrt9yjg-6CQ/exec'; 
 
     window.onload = function() {
@@ -202,7 +200,6 @@
 
     function formatearMonto(input) {
         let valorRaw = input.value.replace(/\D/g, "");
-        
         if (valorRaw === "") {
             input.value = "";
             return;
@@ -213,15 +210,20 @@
     function updateTeaLabel() {
         const tnaVal = parseFloat(document.getElementById('tna').value);
         if(!isNaN(tnaVal) && tnaVal > 0) {
-            const teaVal = (Math.pow(1 + (tnaVal / 100 / 12), 12) - 1) * 100;
-            document.getElementById('label-tasas').innerHTML = `CFT: ${tnaVal}% | TEA: ${teaVal.toFixed(1)}%`;
+            const temVal = (tnaVal / 365) * 30; 
+            const teaVal = (Math.pow(1 + (temVal / 100), 365 / 30) - 1) * 100;
+
+            document.getElementById('label-tasas').innerHTML = `
+            Descubiertos en cta. cte. (CFT)<br>
+            <span style="font-size:11px; font-weight:700; color:#374151; text-transform:none; letter-spacing:0;">
+            T.N.A. ${tnaVal.toFixed(2)}% | T.E.A. ${teaVal.toFixed(2)}% | T.E.M. ${temVal.toFixed(3)}%
+            </span>`;
         }
     }
 
     function startAudit() {
         const montoRaw = document.getElementById('monto').value.replace(/\D/g, "");
         const monto = parseFloat(montoRaw);
-        
         const fV = new Date(document.getElementById('fechaVenc').value);
         const tna = parseFloat(document.getElementById('tna').value) / 100;
         const margen = parseFloat(document.getElementById('margen').value) / 100;
@@ -239,12 +241,32 @@
             const ahora = new Date();
             const diasExactos = Math.max(0, (ahora - fV) / 86400000);
             
+            // NUEVAS VARIABLES DEL BRIEF
+            const diasEnteros = Math.floor(diasExactos);
             const totalActual = monto * (tna / 365) * diasExactos;
-            const costoDiario = diasExactos > 0 ? totalActual / diasExactos : 0;
+            const costoDiario = diasExactos > 0 ? totalActual / diasExactos : 0; // CORREGIDO PARA NO DUPLICAR
             const ratio = monto > 0 ? totalActual / monto : 0;
 
+            // RENDERIZAR TOTAL
             document.getElementById('cont-total').innerText = fmt.format(totalActual);
 
+            // RENDERIZAR CAJA DE URGENCIA
+            document.getElementById('dias-transcurridos').innerText = `⏱ Ya pasaron ${diasEnteros} días desde el vencimiento`;
+            document.getElementById('perdida-diaria').innerText = `🔥 Estás perdiendo ${fmt.format(costoDiario)} por día`;
+            
+            let mensajeUrgencia = "";
+            if (diasEnteros < 30) {
+                mensajeUrgencia = "Todavía estás a tiempo de corregir esto antes de que impacte fuerte en tu caja.";
+            } else if (diasEnteros < 60) {
+                mensajeUrgencia = "Esto ya está empezando a erosionar tu rentabilidad.";
+            } else if (diasEnteros < 90) {
+                mensajeUrgencia = "Hace demasiado tiempo que estás financiando a tu cliente.";
+            } else {
+                mensajeUrgencia = "Este nivel de demora ya representa una pérdida concreta de capital.";
+            }
+            document.getElementById('mensaje-urgencia').innerText = `“${mensajeUrgencia}”`;
+
+            // RENDERIZAR DIAGNÓSTICO
             let score = "", color = "", msg = "", btnText = "";
             if (ratio < 0.02) {
                 score = "Urgencia: BAJA"; color = "var(--success)"; msg = "Todavía estás a tiempo de corregir esto sin impacto relevante."; btnText = "Hablar con Mariano";
@@ -260,16 +282,17 @@
             document.getElementById('diag-score').style.color = color;
             document.getElementById('diag-ratio').innerHTML = `La pérdida ya representa el <b>${(ratio * 100).toFixed(2)}%</b> del capital original.`;
             document.getElementById('diag-msg').innerText = msg;
-            document.getElementById('diag-msg').style.color = color;
             
             const btnAccion = document.getElementById('btn-accion');
             btnAccion.innerText = btnText;
             btnAccion.style.background = ratio >= 0.10 ? "var(--danger)" : "var(--success)";
             
+            // RENDERIZAR PROYECCIONES
             document.getElementById('proj-30').innerText = fmt.format(totalActual + (costoDiario * 30));
             document.getElementById('proj-60').innerText = fmt.format(totalActual + (costoDiario * 60));
             document.getElementById('proj-90').innerText = fmt.format(totalActual + (costoDiario * 90));
             
+            // RENDERIZAR IMPACTO EN VENTAS
             const ventaExtra = margen > 0 ? totalActual / margen : 0; 
             document.getElementById('extra-ventas').innerText = `Ventas adicionales requeridas:\n${fmt.format(ventaExtra)}`;
             document.getElementById('explicacion-impacto').innerHTML = `Considerando tu margen del ${(margen*100).toFixed(0)}%, necesitás facturar esta cifra solo para recuperar la pérdida financiera de ${fmt.format(totalActual)}.`;
@@ -282,7 +305,6 @@
         const email = document.getElementById('lead-email').value;
         const totalPerdida = document.getElementById('cont-total').innerText;
         const scoreTexto = document.getElementById('diag-score').innerText.replace('Urgencia: ', '');
-        
         const montoRaw = document.getElementById('monto').value.replace(/\D/g, "");
         const montoVal = fmt.format(parseFloat(montoRaw) || 0);
 
@@ -293,13 +315,7 @@
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    nombre: nombre, 
-                    email: email, 
-                    perdida: totalPerdida, 
-                    capital: montoVal, 
-                    urgencia: scoreTexto 
-                })
+                body: JSON.stringify({ nombre: nombre, email: email, perdida: totalPerdida, capital: montoVal, urgencia: scoreTexto })
             });
         } catch (e) { console.log("Error al capturar lead"); }
 
