@@ -11,34 +11,40 @@
             --primary: #58a6ff;
             --danger: #f85149;
             --warning: #f1e05a;
+            --orange: #d18616;
             --success: #238636;
             --text: #c9d1d9;
             --text-dim: #8b949e;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background: var(--bg); color: var(--text); padding: 15px; overflow-x: hidden;
+            background: var(--bg); color: var(--text); padding: 15px; overflow-x: hidden; line-height: 1.5;
         }
 
         .container { width: 100%; max-width: 450px; margin: 0 auto; }
         
-        .hero { text-align: center; padding: 25px 0; }
-        .hero h1 { font-size: 22px; color: #fff; margin-bottom: 8px; }
+        .hero { text-align: center; padding: 25px 0 20px; }
+        .hero h1 { font-size: 22px; color: #fff; margin-bottom: 8px; line-height: 1.2; }
         .hero p { color: var(--warning); font-weight: 700; font-size: 12px; text-transform: uppercase; }
 
-        .audit-card { background: var(--surface); border: 1px solid #30363d; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .audit-card { background: var(--surface); border: 1px solid #30363d; border-radius: 12px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; }
         
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
         .full-width { grid-column: span 2; }
-        .field { display: flex; flex-direction: column; gap: 5px; }
+        .field { display: flex; flex-direction: column; gap: 6px; width: 100%; }
         label { font-size: 9px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
         
         input { 
             background: #0d1117; border: 1px solid #30363d; color: #fff; padding: 12px; 
-            border-radius: 8px; font-size: 16px; width: 100%; outline: none;
+            border-radius: 8px; font-size: 14px; width: 100%; outline: none;
+        }
+
+        @media (max-width: 360px) {
+            .input-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
         }
         
         .btn-main { 
@@ -48,21 +54,29 @@
         
         .dashboard { display: none; margin-top: 25px; border-top: 1px solid #30363d; padding-top: 20px; }
         
+        /* TOTAL PERDIDO */
         .total-box { background: rgba(88, 166, 255, 0.08); border: 1px solid var(--primary); border-radius: 10px; padding: 15px; text-align: center; margin-bottom: 15px; }
         .total-box span { display: block; font-size: 10px; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
-        .total-amount { font-size: 28px; font-weight: 800; color: #fff; font-family: monospace; }
+        .total-amount { font-size: 26px; font-weight: 800; color: #fff; font-family: monospace; word-break: break-all; }
 
-        .alert-critical { display: none; background: rgba(248, 81, 73, 0.15); border: 1px solid var(--danger); color: #ff7b72; padding: 10px; border-radius: 6px; font-size: 12px; text-align: center; margin-bottom: 15px; font-weight: 600; }
+        /* NUEVO: PANEL DE DIAGNÓSTICO */
+        .diagnostic-box { background: #1c2128; border: 1px solid #30363d; border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: center; }
+        .diag-title { font-size: 10px; color: var(--text-dim); text-transform: uppercase; font-weight: 700; margin-bottom: 5px; }
+        .diag-score { font-size: 18px; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; }
+        .diag-ratio { font-size: 12px; color: var(--text); margin-bottom: 10px; }
+        .diag-msg { font-size: 13px; font-weight: 600; padding-top: 10px; border-top: 1px solid #30363d; }
 
+        /* PROYECCIONES Y NEGOCIO */
         .projection-box { background: rgba(255, 255, 255, 0.03); border: 1px solid #30363d; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
-        .projection-title { font-size: 10px; font-weight: 800; color: var(--warning); display: block; margin-bottom: 12px; text-transform: uppercase; text-align: center; }
-        .projection-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 11px; }
+        .projection-title { font-size: 10px; font-weight: 800; color: var(--text-dim); display: block; margin-bottom: 12px; text-transform: uppercase; text-align: center; }
+        .projection-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 11px; align-items: center; }
 
-        .business-impact { background: #1c2128; border-left: 4px solid var(--primary); padding: 15px; margin-bottom: 20px; }
+        .business-impact { background: rgba(88, 166, 255, 0.05); border-left: 4px solid var(--primary); padding: 15px; margin-bottom: 20px; border-radius: 4px; }
         .business-impact h3 { font-size: 11px; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; }
-        .business-impact p { font-size: 14px; color: #fff; font-weight: 700; }
+        .business-impact p { font-size: 13px; color: #fff; font-weight: 700; }
 
-        .mind-break-container { margin: 20px 0; padding: 15px; border-top: 1px solid #30363d; text-align: center; }
+        /* QUIEBRE MENTAL Y LEAD FORM */
+        .mind-break-container { margin: 20px 0; padding: 15px; border-top: 1px solid #30363d; border-bottom: 1px solid #30363d; text-align: center; }
         .mind-break-text { color: #fff; font-size: 14px; font-weight: 600; }
         .mind-break-sub { color: var(--warning); font-size: 12px; margin-top: 4px; }
 
@@ -73,9 +87,8 @@
         .response-time { display: block; text-align: center; font-size: 10px; color: var(--text-dim); margin-top: 10px; font-weight: 700; }
         
         .disclaimer { font-size: 9px; color: var(--text-dim); text-align: center; margin-top: 15px; line-height: 1.3; }
-
-        .footer { text-align: center; font-size: 9px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #30363d; }
-        .footer a { color: var(--primary); text-decoration: none; }
+        .footer { text-align: center; font-size: 9px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #30363d; color: var(--text-dim); }
+        .footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
     </style>
 </head>
 <body>
@@ -83,14 +96,14 @@
 <div class="container">
     <section class="hero">
         <h1>Estás financiando a tus clientes sin darte cuenta</h1>
-        <p>Tu cliente usa tu plata gratis. Dejá de financiar su negocio.</p>
+        <p>TU CLIENTE USA TU PLATA GRATIS. DEJÁ DE FINANCIAR SU NEGOCIO.</p>
     </section>
 
     <div class="audit-card">
         <div class="input-grid">
             <div class="field full-width">
                 <label>Capital Adeudado (ARS)</label>
-                <input type="number" id="monto" placeholder="Ej: 50000000">
+                <input type="number" id="monto" placeholder="Ej: 50000000" inputmode="decimal">
             </div>
             <div class="field">
                 <label>Vencimiento</label>
@@ -98,39 +111,45 @@
             </div>
             <div class="field">
                 <label>Margen Neto (%)</label>
-                <input type="number" id="margen" value="20">
+                <input type="number" id="margen" value="20" inputmode="decimal">
             </div>
             <div class="field full-width">
-                <label id="label-tasas">Costo Financiero Total (CFT) % BNA</label>
-                <input type="number" id="tna" value="94.42" oninput="updateTeaLabel()">
+                <label id="label-tasas">CFT % BNA (Costo Fin. Total)</label>
+                <input type="number" id="tna" value="94.42" oninput="updateTeaLabel()" inputmode="decimal">
             </div>
         </div>
         <button class="btn-main" onclick="startAudit()">Auditar pérdida ahora</button>
 
         <div id="dashboard" class="dashboard">
-            <div id="crit-alert" class="alert-critical">⚠️ Ya perdiste más del 5% del capital. Esto dejó de ser un atraso, es un problema financiero grave.</div>
-
+            
             <div class="total-box">
-                <span>💸 PLATA QUE YA PERDISTE (COSTO FINANCIERO):</span>
+                <span>💸 COSTO FINANCIERO ABSORBIDO:</span>
                 <div id="cont-total" class="total-amount"></div>
             </div>
 
+            <div class="diagnostic-box">
+                <div class="diag-title">Diagnóstico de Situación</div>
+                <div id="diag-score" class="diag-score"></div>
+                <div id="diag-ratio" class="diag-ratio"></div>
+                <div id="diag-msg" class="diag-msg"></div>
+            </div>
+
             <div class="projection-box">
-                <span class="projection-title">🔥 SI NO HACÉS NADA, VAS A HABER PERDIDO:</span>
-                <div class="projection-row"><span>En 30 días:</span><span id="proj-30" style="color:var(--danger); font-weight:700;"></span></div>
-                <div class="projection-row"><span>En 60 días:</span><span id="proj-60" style="color:var(--danger); font-weight:700;"></span></div>
-                <div class="projection-row"><span>En 90 días:</span><span id="proj-90" style="color:var(--danger); font-weight:700;"></span></div>
+                <span class="projection-title">📈 Proyección de Inacción:</span>
+                <div class="projection-row"><span>En 30 días la pérdida sumará:</span><span id="proj-30" style="color:var(--danger); font-weight:700;"></span></div>
+                <div class="projection-row"><span>En 60 días la pérdida sumará:</span><span id="proj-60" style="color:var(--danger); font-weight:700;"></span></div>
+                <div class="projection-row"><span>En 90 días la pérdida sumará:</span><span id="proj-90" style="color:var(--danger); font-weight:700;"></span></div>
             </div>
 
             <div class="business-impact">
-                <h3>Esfuerzo Comercial Necesario:</h3>
+                <h3>Esfuerzo Comercial de Recupero:</h3>
                 <p id="extra-ventas"></p>
-                <div id="explicacion-impacto" style="font-size: 10px; color: var(--text-dim); margin-top: 8px;"></div>
+                <div id="explicacion-impacto" style="font-size: 10px; color: var(--text-dim); margin-top: 8px; font-weight: 400;"></div>
             </div>
 
             <div class="mind-break-container">
                 <div class="mind-break-text">El problema no es la mora.</div>
-                <div class="mind-break-sub">Es capital de trabajo que desaparece de tu patrimonio.</div>
+                <div class="mind-break-sub">Es capital que desaparece de tu patrimonio.</div>
             </div>
 
             <div class="lead-form">
@@ -144,7 +163,7 @@
             <span class="response-time">TE RESPONDO EN MENOS DE 1 HORA</span>
 
             <div class="disclaimer">
-                Cálculo basado en tasa activa bancaria (CFT) sobre saldos vencidos.<br>No incluye costos legales ni punitorios adicionales.
+                Cálculo basado en tasa activa bancaria (CFT) sobre saldos vencidos.<br>No incluye costos de gestión, legales ni punitorios adicionales.
             </div>
         </div>
     </div>
@@ -172,9 +191,8 @@
         const tna = parseFloat(document.getElementById('tna').value) / 100;
         const margen = parseFloat(document.getElementById('margen').value) / 100;
 
-        // Validaciones profesionales
         if(!monto || monto <= 0 || isNaN(fV.getTime()) || margen <= 0 || tna <= 0) {
-            return alert("Completá todos los datos correctamente para realizar la auditoría.");
+            return alert("Completá todos los datos correctamente para auditar.");
         }
         
         document.getElementById('dashboard').style.display = 'block';
@@ -185,51 +203,69 @@
             const ahora = new Date();
             const diasExactos = (ahora - fV) / 86400000;
             
-            if (diasExactos <= 0) {
-                document.getElementById('cont-total').innerText = fmt.format(0);
-                return;
-            }
+            if (diasExactos <= 0) return;
 
-            // Modelo matemático simplificado y defendible (Solo Interés Financiero sobre saldos)
             const totalActual = monto * (tna / 365) * diasExactos;
             const costoDiario = totalActual / diasExactos;
+            const ratio = totalActual / monto;
 
+            // 1. Mostrar Total
             document.getElementById('cont-total').innerText = fmt.format(totalActual);
+
+            // 2. Lógica de Diagnóstico (Score y Segmentación)
+            let score = "", color = "", msg = "";
+            if (ratio < 0.02) {
+                score = "Urgencia: BAJA";
+                color = "var(--success)";
+                msg = "Todavía estás a tiempo de corregir esto sin impacto relevante.";
+            } else if (ratio < 0.05) {
+                score = "Urgencia: MEDIA";
+                color = "var(--warning)";
+                msg = "Esto ya empieza a afectar la rentabilidad de tu operación.";
+            } else if (ratio < 0.10) {
+                score = "Urgencia: ALTA";
+                color = "var(--orange)";
+                msg = "Esto está deteriorando gravemente tu resultado financiero.";
+            } else {
+                score = "Urgencia: CRÍTICA";
+                color = "var(--danger)";
+                msg = "Esto ya representa una pérdida significativa de patrimonio.";
+            }
+
+            const diagScore = document.getElementById('diag-score');
+            diagScore.innerText = score;
+            diagScore.style.color = color;
+            document.getElementById('diag-ratio').innerHTML = `La pérdida ya representa el <b>${(ratio * 100).toFixed(2)}%</b> del capital original.`;
+            const diagMsg = document.getElementById('diag-msg');
+            diagMsg.innerText = msg;
+            diagMsg.style.color = color;
             
-            // Proyecciones
+            // 3. Proyecciones
             document.getElementById('proj-30').innerText = fmt.format(totalActual + (costoDiario * 30));
             document.getElementById('proj-60').innerText = fmt.format(totalActual + (costoDiario * 60));
             document.getElementById('proj-90').innerText = fmt.format(totalActual + (costoDiario * 90));
             
-            // Impacto en negocio
+            // 4. Impacto en negocio
             const ventaExtra = totalActual / margen; 
-            document.getElementById('extra-ventas').innerText = `Ventas extra necesarias: ${fmt.format(ventaExtra)}`;
-            document.getElementById('explicacion-impacto').innerHTML = `Con tu margen del ${(margen*100).toFixed(0)}%, debés facturar esa cifra adicional solo para "empatar" el costo financiero de ${fmt.format(totalActual)}.`;
+            document.getElementById('extra-ventas').innerText = `Ventas adicionales requeridas: ${fmt.format(ventaExtra)}`;
+            document.getElementById('explicacion-impacto').innerHTML = `Considerando tu margen del ${(margen*100).toFixed(0)}%, necesitás facturar esta cifra solo para recuperar la pérdida financiera.`;
 
-            // Alerta irreversible (Momento del 5%)
-            if(totalActual > monto * 0.05) {
-                document.getElementById('crit-alert').style.display = 'block';
-            } else {
-                document.getElementById('crit-alert').style.display = 'none';
-            }
-        }, 1000); // Timer a 1 segundo para estabilidad y credibilidad
+        }, 1000); 
     }
 
     function sendWA() {
         const nombre = document.getElementById('lead-nombre').value;
         const empresa = document.getElementById('lead-empresa').value;
         const totalPerdida = document.getElementById('cont-total').innerText;
-        const montoVal = fmt.format(document.getElementById('monto').value);
-        const fV = document.getElementById('fechaVenc').value;
-        const dias = Math.floor((new Date() - new Date(fV)) / 86400000);
-
+        const scoreTexto = document.getElementById('diag-score').innerText.replace('Urgencia: ', '');
+        
         if(!nombre || !empresa) return alert("Completá tus datos para que pueda ayudarte.");
         
-        const msg = encodeURIComponent(`Hola Mariano, soy ${nombre} de ${empresa}. Tengo una deuda de ${montoVal} con ${dias} días de mora. La auditoría me muestra una pérdida de ${totalPerdida}. Ayudame a cobrar esto.`);
+        const msg = encodeURIComponent(`Hola Mariano, soy ${nombre} de ${empresa}. La auditoría me indica una urgencia ${scoreTexto} con una pérdida de ${totalPerdida}. Necesito tu ayuda para cobrar esto.`);
         window.location.href = `https://wa.me/5491166463800?text=${msg}`;
     }
 
-    updateTeaLabel(); // Inicializar label
+    updateTeaLabel();
 </script>
 </body>
 </html>
