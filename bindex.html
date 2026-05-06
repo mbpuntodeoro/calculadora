@@ -73,7 +73,6 @@
         .total-box span { display: block; font-size: 10px; font-weight: 800; color: #1e3a8a; margin-bottom: 5px; }
         .total-amount { font-size: 28px; font-weight: 800; color: var(--primary); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-variant-numeric: tabular-nums; word-break: break-all; }
 
-        /* NUEVOS ESTILOS: URGENCY BOX */
         .urgency-box { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 12px; padding: 16px; margin-bottom: 20px; text-align: center; }
         .urgency-days { font-size: 14px; font-weight: 700; color: #9a3412; margin-bottom: 6px; }
         .urgency-daily { font-size: 20px; font-weight: 800; color: #dc2626; margin-bottom: 8px; font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; }
@@ -84,6 +83,7 @@
         .diag-score { font-size: 18px; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; }
         .diag-ratio { font-size: 13px; color: var(--text); margin-bottom: 12px; }
         .diag-msg { font-size: 13px; font-weight: 600; padding-top: 12px; border-top: 1px solid var(--border); }
+        .diag-accion { margin-top: 8px; font-size: 13px; font-weight: 700; }
 
         .projection-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
         .projection-title { font-size: 10px; font-weight: 800; color: var(--danger); display: block; margin-bottom: 12px; text-transform: uppercase; text-align: center; }
@@ -154,6 +154,7 @@
                 <div id="diag-score" class="diag-score"></div>
                 <div id="diag-ratio" class="diag-ratio"></div>
                 <div id="diag-msg" class="diag-msg"></div>
+                <div id="diag-accion" class="diag-accion"></div>
             </div>
 
             <div class="projection-box">
@@ -241,16 +242,13 @@
             const ahora = new Date();
             const diasExactos = Math.max(0, (ahora - fV) / 86400000);
             
-            // NUEVAS VARIABLES DEL BRIEF
             const diasEnteros = Math.floor(diasExactos);
             const totalActual = monto * (tna / 365) * diasExactos;
-            const costoDiario = diasExactos > 0 ? totalActual / diasExactos : 0; // CORREGIDO PARA NO DUPLICAR
+            const costoDiario = diasExactos > 0 ? totalActual / diasExactos : 0; 
             const ratio = monto > 0 ? totalActual / monto : 0;
 
-            // RENDERIZAR TOTAL
             document.getElementById('cont-total').innerText = fmt.format(totalActual);
 
-            // RENDERIZAR CAJA DE URGENCIA
             document.getElementById('dias-transcurridos').innerText = `⏱ Ya pasaron ${diasEnteros} días desde el vencimiento`;
             document.getElementById('perdida-diaria').innerText = `🔥 Estás perdiendo ${fmt.format(costoDiario)} por día`;
             
@@ -266,33 +264,57 @@
             }
             document.getElementById('mensaje-urgencia').innerText = `“${mensajeUrgencia}”`;
 
-            // RENDERIZAR DIAGNÓSTICO
-            let score = "", color = "", msg = "", btnText = "";
+            // NUEVA LÓGICA DE DIAGNÓSTICO
+            let score = "", color = "", msg = "", accion = "", btnText = "";
+
             if (ratio < 0.02) {
-                score = "Urgencia: BAJA"; color = "var(--success)"; msg = "Todavía estás a tiempo de corregir esto sin impacto relevante."; btnText = "Hablar con Mariano";
-            } else if (ratio < 0.05) {
-                score = "Urgencia: MEDIA"; color = "var(--warning)"; msg = "Esto ya empieza a afectar la rentabilidad de tu operación."; btnText = "Solicitar asesoría";
-            } else if (ratio < 0.10) {
-                score = "Urgencia: ALTA"; color = "var(--orange)"; msg = "Esto está deteriorando gravemente tu resultado financiero."; btnText = "Quiero recuperar mi plata";
-            } else {
-                score = "Urgencia: CRÍTICA"; color = "var(--danger)"; msg = "Esto ya representa una pérdida significativa de patrimonio."; btnText = "Pedir ayuda urgente";
+                score = "Impacto bajo (todavía controlable)";
+                color = "var(--success)";
+                msg = "Hoy el impacto es bajo, pero si no actuás, esto empieza a crecer mes a mes.";
+                accion = "Podés corregir esto ahora antes de que escale.";
+                btnText = "Analizar mi caso";
+            }
+            else if (ratio < 0.05) {
+                score = "Impacto moderado";
+                color = "var(--warning)";
+                msg = "La mora ya está afectando tu rentabilidad real, aunque no lo estés viendo en caja.";
+                accion = "Este es el punto ideal para intervenir y recuperar capital.";
+                btnText = "Quiero mejorar esto";
+            }
+            else if (ratio < 0.10) {
+                score = "Impacto alto";
+                color = "var(--orange)";
+                msg = "Ya estás absorbiendo un costo financiero relevante por no cobrar.";
+                accion = "👉 Cada día que pasa, recuperar esto se vuelve más difícil.";
+                btnText = "Recuperar este dinero";
+            }
+            else {
+                score = "Impacto crítico";
+                color = "var(--danger)";
+                msg = "Esta deuda ya representa una pérdida concreta de capital.";
+                accion = "Necesitás intervenir ahora para evitar seguir perdiendo.";
+                btnText = "Recuperar esto ahora";
             }
 
             document.getElementById('diag-score').innerText = score;
             document.getElementById('diag-score').style.color = color;
+            
             document.getElementById('diag-ratio').innerHTML = `La pérdida ya representa el <b>${(ratio * 100).toFixed(2)}%</b> del capital original.`;
+            
             document.getElementById('diag-msg').innerText = msg;
+            document.getElementById('diag-msg').style.color = color;
+
+            document.getElementById('diag-accion').innerText = accion;
+            document.getElementById('diag-accion').style.color = color;
             
             const btnAccion = document.getElementById('btn-accion');
             btnAccion.innerText = btnText;
             btnAccion.style.background = ratio >= 0.10 ? "var(--danger)" : "var(--success)";
             
-            // RENDERIZAR PROYECCIONES
             document.getElementById('proj-30').innerText = fmt.format(totalActual + (costoDiario * 30));
             document.getElementById('proj-60').innerText = fmt.format(totalActual + (costoDiario * 60));
             document.getElementById('proj-90').innerText = fmt.format(totalActual + (costoDiario * 90));
             
-            // RENDERIZAR IMPACTO EN VENTAS
             const ventaExtra = margen > 0 ? totalActual / margen : 0; 
             document.getElementById('extra-ventas').innerText = `Ventas adicionales requeridas:\n${fmt.format(ventaExtra)}`;
             document.getElementById('explicacion-impacto').innerHTML = `Considerando tu margen del ${(margen*100).toFixed(0)}%, necesitás facturar esta cifra solo para recuperar la pérdida financiera de ${fmt.format(totalActual)}.`;
@@ -304,7 +326,10 @@
         const nombre = document.getElementById('lead-nombre').value;
         const email = document.getElementById('lead-email').value;
         const totalPerdida = document.getElementById('cont-total').innerText;
-        const scoreTexto = document.getElementById('diag-score').innerText.replace('Urgencia: ', '');
+        
+        // Ajustado para capturar el nuevo texto de impacto correctamente
+        const scoreTexto = document.getElementById('diag-score').innerText; 
+        
         const montoRaw = document.getElementById('monto').value.replace(/\D/g, "");
         const montoVal = fmt.format(parseFloat(montoRaw) || 0);
 
@@ -319,7 +344,7 @@
             });
         } catch (e) { console.log("Error al capturar lead"); }
 
-        const msg = encodeURIComponent(`Hola Mariano, soy ${nombre}. La auditoría de MB Capital me indica una urgencia ${scoreTexto} con una pérdida de ${totalPerdida}. Necesito tu ayuda para cobrar esto.`);
+        const msg = encodeURIComponent(`Hola Mariano, soy ${nombre}. La auditoría de MB Capital me indica un ${scoreTexto} con una pérdida de ${totalPerdida}. Necesito tu ayuda para cobrar esto.`);
         window.location.href = `https://wa.me/5491166463800?text=${msg}`;
     }
 </script>
