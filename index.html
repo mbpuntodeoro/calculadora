@@ -45,7 +45,7 @@
         .business-impact h3 { margin: 0 0 10px 0; font-size: 13px; color: var(--primary); text-transform: uppercase; }
         .business-impact p { margin: 0; font-size: 14px; color: #fff; font-weight: 700; }
 
-        .emotional-hook { color: var(--warning); font-size: 14px; font-weight: 700; text-align: center; margin: 25px 0 15px; line-height: 1.4; display: block; }
+        .mind-break { text-align: center; padding: 20px; font-style: italic; color: var(--warning); font-size: 14px; font-weight: 600; line-height: 1.4; }
 
         .lead-form { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; border: 1px solid #30363d; margin-bottom: 10px; }
         .lead-form h4 { margin: 0 0 15px 0; font-size: 12px; color: var(--primary); text-transform: uppercase; text-align: center; }
@@ -71,8 +71,14 @@
             <div class="field" style="grid-column: span 2;"><label>Capital Nominal Adeudado (ARS)</label><input type="number" id="monto" placeholder="Ej: 50.000.000"></div>
             <div class="field"><label>Desde (Vencimiento)</label><input type="date" id="fechaVenc"></div>
             <div class="field"><label>Hasta (Auditoría)</label><input type="date" id="fechaCorte"></div>
-            <div class="field" style="grid-column: span 2;">
-                <label id="label-tasas">Costo Financiero Total (CFT) % BNA</label>
+            
+            <div class="field">
+                <label>Margen de Ganancia Neto (%)</label>
+                <input type="number" id="margen" value="20" placeholder="Ej: 15">
+            </div>
+            
+            <div class="field">
+                <label id="label-tasas">CFT % BNA</label>
                 <input type="number" id="tna" value="94.42" oninput="updateTeaLabel()">
             </div>
         </div>
@@ -100,15 +106,11 @@
                     <span>En <b>90 días</b> habrás perdido:</span>
                     <span id="proj-90" style="color:var(--danger); font-weight:700; font-family:monospace;"></span>
                 </div>
-                
-                <p style="font-size: 11px; color: var(--text); text-align: center; font-style: italic; border-top: 1px dashed rgba(248, 81, 73, 0.3); padding-top: 15px; margin: 0;">
-                    Cada día que no cobrás, estás financiando a tu cliente con tu plata.
-                </p>
             </div>
 
             <div class="business-impact">
                 <h3>Impacto en tu negocio:</h3>
-                <p id="extra-ventas">Analizando esfuerzo comercial...</p>
+                <p id="extra-ventas">Analizando...</p>
             </div>
 
             <div class="mind-break">
@@ -152,7 +154,7 @@
         const tnaVal = parseFloat(document.getElementById('tna').value);
         if(!isNaN(tnaVal)) {
             const teaVal = (Math.pow(1 + (tnaVal / 100 / 12), 12) - 1) * 100;
-            document.getElementById('label-tasas').innerHTML = `CFT BNA: ${tnaVal}% | TEA REAL: ${teaVal.toFixed(1)}%`;
+            document.getElementById('label-tasas').innerHTML = `CFT: ${tnaVal}% | TEA: ${teaVal.toFixed(1)}%`;
         }
     }
 
@@ -160,15 +162,13 @@
         const dias = (corte - venc) / 86400000;
         if (dias <= 0) return 1;
         let factor = 1;
-        let huboDatos = false;
         dataInflacionGlobal.forEach(entry => {
             const fMes = new Date(entry.fecha);
             if (fMes >= new Date(venc.getFullYear(), venc.getMonth(), 1) && fMes <= new Date(corte.getFullYear(), corte.getMonth(), 1)) {
                 factor *= (1 + (entry.valor / 100));
-                huboDatos = true;
             }
         });
-        if (!huboDatos) factor = Math.pow(1 + ultimaTasaConocida, dias / 30);
+        if (factor === 1) factor = Math.pow(1 + ultimaTasaConocida, dias / 30);
         return factor;
     }
 
@@ -177,52 +177,45 @@
         const fV = new Date(document.getElementById('fechaVenc').value);
         const inputCorte = new Date(document.getElementById('fechaCorte').value);
         const tna = parseFloat(document.getElementById('tna').value) / 100;
+        const margen = parseFloat(document.getElementById('margen').value) / 100;
 
-        if(!monto || isNaN(fV.getTime())) return alert("Ingresá monto y fecha de vencimiento");
+        if(!monto || isNaN(fV.getTime()) || !margen) return alert("Por favor, ingresá todos los datos (Monto, Fecha y Margen).");
         
         document.getElementById('dashboard').style.display = 'block';
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         clearInterval(timer);
 
-        const baseTime = fV.getTime();
-
         timer = setInterval(() => {
             const ahora = new Date();
-            let tiempoRef;
-            if (inputCorte.toDateString() === ahora.toDateString()) {
-                tiempoRef = ahora.getTime();
-            } else {
-                tiempoRef = inputCorte.getTime() + (ahora.getTime() % 10000); 
-            }
+            let tiempoRef = (inputCorte.toDateString() === ahora.toDateString()) ? ahora.getTime() : inputCorte.getTime() + (ahora.getTime() % 10000);
             
-            const diasExactos = (tiempoRef - baseTime) / 86400000;
+            const diasExactos = (tiempoRef - fV.getTime()) / 86400000;
             if (diasExactos < 0) return;
 
             const pFin = monto * (tna / 365) * diasExactos;
             const factor = getFactorCompuesto(fV, new Date(tiempoRef));
             const pDev = monto * (factor - 1);
             const totalActual = pFin + pDev;
-            const costoDiarioPromedio = totalActual / diasExactos;
+            const costoDiario = totalActual / diasExactos;
 
             document.getElementById('cont-total').innerText = fmt.format(totalActual);
-            document.getElementById('proj-30').innerText = fmt.format(totalActual + (costoDiarioPromedio * 30));
-            document.getElementById('proj-60').innerText = fmt.format(totalActual + (costoDiarioPromedio * 60));
-            document.getElementById('proj-90').innerText = fmt.format(totalActual + (costoDiarioPromedio * 90));
+            document.getElementById('proj-30').innerText = fmt.format(totalActual + (costoDiario * 30));
+            document.getElementById('proj-60').innerText = fmt.format(totalActual + (costoDiario * 60));
+            document.getElementById('proj-90').innerText = fmt.format(totalActual + (costoDiario * 90));
             
-            const ventaExtra = totalActual / 0.3; 
-            document.getElementById('extra-ventas').innerText = `Necesitás vender ${fmt.format(ventaExtra)} adicionales solo para empatar esta pérdida.`;
+            // CÁLCULO BASADO EN EL MARGEN DEL USUARIO
+            const ventaExtra = totalActual / margen; 
+            document.getElementById('extra-ventas').innerText = `Necesitás vender ${fmt.format(ventaExtra)} adicionales para recuperar esta pérdida neta.`;
         }, 50);
     }
 
     function sendWA() {
         const nombre = document.getElementById('lead-nombre').value;
         const empresa = document.getElementById('lead-empresa').value;
-        const montoVal = fmt.format(document.getElementById('monto').value);
         const totalPerdida = document.getElementById('cont-total').innerText;
-        
-        if(!nombre || !empresa) return alert("Por favor, completá Nombre y Empresa.");
+        if(!nombre || !empresa) return alert("Completá Nombre y Empresa para continuar.");
 
-        const msg = encodeURIComponent(`Hola Mariano, soy ${nombre} de ${empresa}. Mi cliente está usando mi plata gratis y la auditoría de MB Capital detectó una pérdida acumulada de ${totalPerdida}. Ayudame a cobrar esto.`);
+        const msg = encodeURIComponent(`Hola Mariano, soy ${nombre} de ${empresa}. La auditoría de MB Capital me mostró una pérdida de ${totalPerdida}. Ayudame a cobrar esto.`);
         window.location.href = `https://wa.me/5491166463800?text=${msg}`;
     }
 </script>
