@@ -11,9 +11,10 @@
     --surface:#161b22;
     --primary:#58a6ff;
     --danger:#f85149;
+    --warning:#f1e05a;
+    --success:#238636;
     --text:#c9d1d9;
     --text-dim:#8b949e;
-    --success:#238636;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -40,6 +41,7 @@ body{
 
 .field{margin-bottom:12px}
 label{font-size:10px;color:var(--text-dim);display:block;margin-bottom:4px}
+
 input{
     width:100%;
     padding:12px;
@@ -73,7 +75,7 @@ button{
     background:#1c2128;
     padding:15px;
     border-radius:8px;
-    margin-bottom:15px;
+    margin-bottom:12px;
 }
 
 .warn{color:var(--danger);font-weight:700}
@@ -123,11 +125,15 @@ button{
 
 <div class="total" id="total"></div>
 
-<div class="box" id="detalle"></div>
+<div class="box" id="score-box"></div>
 
-<div class="box warn" id="alerta"></div>
+<div class="box" id="segmento-box"></div>
+
+<div class="box" id="proyeccion"></div>
 
 <div class="box" id="ventas"></div>
+
+<div class="box warn" id="alerta"></div>
 
 <div style="font-size:11px;color:#8b949e;margin-top:10px;">
 Cálculo basado en tasa activa bancaria sobre saldos vencidos.
@@ -159,7 +165,7 @@ function calcular(){
     const tna = parseFloat(document.getElementById("tna").value)/100;
     const margen = parseFloat(document.getElementById("margen").value)/100;
 
-    if(!monto || monto<=0 || isNaN(fecha) || tna<=0 || margen<=0){
+    if(!monto || monto<=0 || isNaN(fecha.getTime()) || tna<=0 || margen<=0){
         alert("Completá los datos correctamente");
         return;
     }
@@ -173,17 +179,65 @@ function calcular(){
 
         if(dias <= 0) return;
 
-        // INTERÉS SIMPLE CORRECTO
         const interes = monto * (tna/365) * dias;
 
         document.getElementById("total").innerText = fmt.format(interes);
 
-        const perdidaDia = monto * (tna/365);
+        // SCORE
+        const ratio = interes / monto;
 
-        document.getElementById("detalle").innerHTML =
-        `Capital: ${fmt.format(monto)}<br>
-        Pérdida diaria: ${fmt.format(perdidaDia)}<br>
-        Días transcurridos: ${Math.floor(dias)}`;
+        let score = "";
+        let color = "";
+
+        if (ratio < 0.02){
+            score = "BAJA";
+            color = "#238636";
+        } else if (ratio < 0.05){
+            score = "MEDIA";
+            color = "#f1e05a";
+        } else {
+            score = "ALTA";
+            color = "#f85149";
+        }
+
+        document.getElementById("score-box").innerHTML =
+        `<b>Nivel de urgencia:</b> 
+        <span style="color:${color}; font-weight:700;">${score}</span><br>
+        <span style="font-size:12px; color:#8b949e;">
+        La pérdida ya representa el ${(ratio*100).toFixed(2)}% del capital.
+        </span>`;
+
+        // SEGMENTACIÓN
+        let mensaje = "";
+
+        if (ratio < 0.02){
+            mensaje = "Todavía estás a tiempo de corregir esto sin impacto relevante.";
+        } else if (ratio < 0.05){
+            mensaje = "Esto ya empieza a afectar tu rentabilidad.";
+        } else if (ratio < 0.1){
+            mensaje = "Esto está deteriorando tu resultado financiero.";
+        } else {
+            mensaje = "Esto ya es una pérdida significativa de patrimonio.";
+        }
+
+        document.getElementById("segmento-box").innerText = mensaje;
+
+        // PROYECCIÓN
+        const interes30 = interes + (monto * (tna/365) * 30);
+        const interes60 = interes + (monto * (tna/365) * 60);
+        const interes90 = interes + (monto * (tna/365) * 90);
+
+        document.getElementById("proyeccion").innerHTML =
+        `<b>Proyección:</b><br>
+        30 días: ${fmt.format(interes30)}<br>
+        60 días: ${fmt.format(interes60)}<br>
+        90 días: ${fmt.format(interes90)}`;
+
+        // IMPACTO COMERCIAL
+        const ventas = interes / margen;
+
+        document.getElementById("ventas").innerText =
+        `Necesitás facturar ${fmt.format(ventas)} para recuperar esta pérdida.`;
 
         // ALERTA
         if(interes >= monto * 0.05){
@@ -192,12 +246,6 @@ function calcular(){
         } else {
             document.getElementById("alerta").innerText = "";
         }
-
-        // IMPACTO COMERCIAL
-        const ventas = interes / margen;
-
-        document.getElementById("ventas").innerText =
-        `Necesitás facturar ${fmt.format(ventas)} para recuperar esta pérdida.`;
 
     },1000);
 }
