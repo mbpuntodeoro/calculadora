@@ -110,8 +110,8 @@ button{
 </div>
 
 <div class="field">
-<label>TNA (%) - referencia bancaria</label>
-<input type="number" id="tna" value="120">
+<label id="label-tasa">Cargando tasa...</label>
+<input type="number" id="tna">
 </div>
 
 <div class="field">
@@ -155,6 +155,53 @@ const fmt = new Intl.NumberFormat('es-AR',{
     style:'currency',
     currency:'ARS'
 });
+
+// =====================
+// TASA DESDE API
+// =====================
+
+let tasaDefault = 120;
+
+window.onload = async function(){
+
+    try{
+        const res = await fetch('https://api.argentinadatos.com/v1/tasas/ba-tasa-activa');
+        const data = await res.json();
+
+        const tasaAPI = data[data.length - 1]?.valor;
+
+        if(tasaAPI){
+            document.getElementById("tna").value = tasaAPI.toFixed(2);
+        } else {
+            document.getElementById("tna").value = tasaDefault;
+        }
+
+    } catch(e){
+        document.getElementById("tna").value = tasaDefault;
+    }
+
+    actualizarEtiquetaTasa();
+};
+
+function actualizarEtiquetaTasa(){
+
+    const tnaVal = parseFloat(document.getElementById("tna").value);
+
+    if(!isNaN(tnaVal)){
+
+        const tea = (Math.pow(1 + (tnaVal/100/12), 12) - 1) * 100;
+
+        document.getElementById("label-tasa").innerText =
+        `TNA: ${tnaVal.toFixed(2)}% | TEA: ${tea.toFixed(1)}%`;
+    }
+}
+
+document.getElementById("tna").addEventListener("input", actualizarEtiquetaTasa);
+
+
+// =====================
+// CÁLCULO
+// =====================
 
 function calcular(){
 
@@ -249,6 +296,11 @@ function calcular(){
 
     },1000);
 }
+
+
+// =====================
+// WHATSAPP
+// =====================
 
 function wa(){
 
