@@ -43,12 +43,28 @@
         .field { display: flex; flex-direction: column; gap: 6px; width: 100%; }
         label { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
         
+        /* ACÁ ESTÁ EL CAMBIO DE FUENTES UNIFICADAS */
         input { 
-            background: #ffffff; border: 1px solid #d1d5db; color: var(--text); padding: 12px 14px; 
-            border-radius: 8px; font-size: 15px; width: 100%; outline: none; transition: all 0.2s ease;
+            font-family: inherit; 
+            font-size: 16px; 
+            font-weight: 500;
+            background: #ffffff; 
+            border: 1px solid #d1d5db; 
+            color: var(--text); 
+            padding: 12px 14px; 
+            border-radius: 8px; 
+            width: 100%; 
+            outline: none; 
+            transition: all 0.2s ease;
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
         input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        
+        /* Ajuste para que el ícono del calendario se vea bien */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 0.6;
+            cursor: pointer;
+        }
 
         .btn-main { 
             width: 100%; background: var(--primary); color: #fff; border: none; padding: 16px; 
@@ -184,16 +200,13 @@
         updateTeaLabel();
     };
 
-    // NUEVA FUNCIÓN: Formatea el input en vivo mientras el usuario escribe
     function formatearMonto(input) {
-        // Quita todo lo que no sea un número (letras, puntos, signos)
         let valorRaw = input.value.replace(/\D/g, "");
         
         if (valorRaw === "") {
             input.value = "";
             return;
         }
-        // Formatea con puntos y le agrega el signo pesos
         input.value = "$ " + new Intl.NumberFormat('es-AR').format(parseInt(valorRaw, 10));
     }
 
@@ -206,7 +219,6 @@
     }
 
     function startAudit() {
-        // LIMPIAMOS EL MONTO ANTES DE CALCULAR: Le sacamos el "$" y los puntos
         const montoRaw = document.getElementById('monto').value.replace(/\D/g, "");
         const monto = parseFloat(montoRaw);
         
@@ -271,7 +283,6 @@
         const totalPerdida = document.getElementById('cont-total').innerText;
         const scoreTexto = document.getElementById('diag-score').innerText.replace('Urgencia: ', '');
         
-        // LIMPIAMOS EL MONTO PARA MANDARLO A GOOGLE SHEETS
         const montoRaw = document.getElementById('monto').value.replace(/\D/g, "");
         const montoVal = fmt.format(parseFloat(montoRaw) || 0);
 
