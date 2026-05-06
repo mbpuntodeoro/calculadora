@@ -85,14 +85,19 @@
         .diag-msg { font-size: 13px; font-weight: 600; padding-top: 12px; border-top: 1px solid var(--border); }
         .diag-accion { margin-top: 8px; font-size: 13px; font-weight: 700; }
 
-        .projection-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+        /* AJUSTES NIVEL PRO: PROJECTION BOX */
+        .projection-box { background: transparent; border: none; padding: 0; margin-bottom: 20px; }
         .projection-title { font-size: 10px; font-weight: 800; color: var(--danger); display: block; margin-bottom: 12px; text-transform: uppercase; text-align: center; }
-        .projection-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; align-items: center; font-weight: 500; }
+        .projection-row { display: flex; justify-content: space-between; margin-bottom: 0; font-size: 12px; align-items: center; font-weight: 500; border-bottom: 1px dashed #e5e7eb; padding: 6px 0; }
         .proj-number { font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--danger); }
 
-        .business-impact { background: #f8fafc; border-left: 4px solid var(--primary); padding: 16px; margin-bottom: 25px; border-radius: 0 8px 8px 0; border: 1px solid var(--border); text-align: center; }
+        /* AJUSTES NIVEL PRO: BUSINESS IMPACT */
+        .business-impact { background: transparent; border: none; padding: 0; margin-bottom: 25px; text-align: center; }
         .business-impact h3 { font-size: 11px; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; }
         .business-impact p { font-size: 14px; color: var(--text); font-weight: 700; line-height: 1.3; }
+
+        /* AJUSTES NIVEL PRO: PRE-CTA MESSAGE */
+        .pre-cta-msg { font-size: 12px; color: #6b7280; text-align: center; margin-bottom: 12px; font-weight: 500; }
 
         .lead-form { background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 16px; }
         .lead-form h4 { font-size: 11px; color: var(--primary); text-transform: uppercase; text-align: center; margin-bottom: 16px; }
@@ -127,7 +132,7 @@
                 <input type="number" id="margen" value="20" inputmode="decimal">
             </div>
             <div class="field full-width">
-                <label id="label-tasas">Descubiertos en cta. cte. (CFT)</label>
+                <label id="label-tasas">Tasa activa de referencia (BNA / mercado)</label>
                 <input type="number" id="tna" value="94.42" oninput="updateTeaLabel()" inputmode="decimal">
             </div>
         </div>
@@ -159,9 +164,9 @@
 
             <div class="projection-box">
                 <span class="projection-title">📈 Proyección de Inacción:</span>
-                <div class="projection-row"><span>En 30 días la pérdida sumará:</span><span id="proj-30" class="proj-number"></span></div>
-                <div class="projection-row"><span>En 60 días la pérdida sumará:</span><span id="proj-60" class="proj-number"></span></div>
-                <div class="projection-row"><span>En 90 días la pérdida sumará:</span><span id="proj-90" class="proj-number"></span></div>
+                <div class="projection-row"><span>Si no hacés nada, en 30 días habrás perdido:</span><span id="proj-30" class="proj-number"></span></div>
+                <div class="projection-row"><span>Si no hacés nada, en 60 días habrás perdido:</span><span id="proj-60" class="proj-number"></span></div>
+                <div class="projection-row"><span>Si no hacés nada, en 90 días habrás perdido:</span><span id="proj-90" class="proj-number"></span></div>
             </div>
 
             <div class="business-impact">
@@ -171,11 +176,14 @@
             </div>
 
             <div class="lead-form">
-                <h4>Diseñar Plan de Recupero</h4>
+                <h4>Dejá tus datos y te contacto para armar un plan</h4>
                 <div class="field" style="margin-bottom:12px;"><label>Nombre</label><input type="text" id="lead-nombre" placeholder="Responsable"></div>
                 <div class="field"><label>Tu email</label><input type="email" id="lead-email" placeholder="mail@ejemplo.com"></div>
             </div>
 
+            <div class="pre-cta-msg">
+                Esto no se recupera solo. Requiere gestión activa.
+            </div>
             <button id="btn-accion" class="whatsapp-btn" onclick="sendWA()">Ayudame a cobrar esto</button>
 
             <div class="disclaimer">
@@ -214,10 +222,11 @@
             const temVal = (tnaVal / 365) * 30; 
             const teaVal = (Math.pow(1 + (temVal / 100), 365 / 30) - 1) * 100;
 
+            // AJUSTE NIVEL PRO: HTML DE TASA
             document.getElementById('label-tasas').innerHTML = `
-            Descubiertos en cta. cte. (CFT)<br>
-            <span style="font-size:11px; font-weight:700; color:#374151; text-transform:none; letter-spacing:0;">
-            T.N.A. ${tnaVal.toFixed(2)}% | T.E.A. ${teaVal.toFixed(2)}% | T.E.M. ${temVal.toFixed(3)}%
+            Tasa activa de referencia (BNA / mercado)<br>
+            <span style="font-size:11px; font-weight:600; color:#4b5563; text-transform:none;">
+            TNA ${tnaVal.toFixed(2)}% · TEA ${teaVal.toFixed(2)}% · TEM ${temVal.toFixed(3)}%
             </span>`;
         }
     }
@@ -264,7 +273,6 @@
             }
             document.getElementById('mensaje-urgencia').innerText = `“${mensajeUrgencia}”`;
 
-            // NUEVA LÓGICA DE DIAGNÓSTICO
             let score = "", color = "", msg = "", accion = "", btnText = "";
 
             if (ratio < 0.02) {
@@ -326,10 +334,7 @@
         const nombre = document.getElementById('lead-nombre').value;
         const email = document.getElementById('lead-email').value;
         const totalPerdida = document.getElementById('cont-total').innerText;
-        
-        // Ajustado para capturar el nuevo texto de impacto correctamente
         const scoreTexto = document.getElementById('diag-score').innerText; 
-        
         const montoRaw = document.getElementById('monto').value.replace(/\D/g, "");
         const montoVal = fmt.format(parseFloat(montoRaw) || 0);
 
