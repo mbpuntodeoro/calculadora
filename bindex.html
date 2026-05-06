@@ -85,18 +85,15 @@
         .diag-msg { font-size: 13px; font-weight: 600; padding-top: 12px; border-top: 1px solid var(--border); }
         .diag-accion { margin-top: 8px; font-size: 13px; font-weight: 700; }
 
-        /* AJUSTES NIVEL PRO: PROJECTION BOX */
         .projection-box { background: transparent; border: none; padding: 0; margin-bottom: 20px; }
         .projection-title { font-size: 10px; font-weight: 800; color: var(--danger); display: block; margin-bottom: 12px; text-transform: uppercase; text-align: center; }
         .projection-row { display: flex; justify-content: space-between; margin-bottom: 0; font-size: 12px; align-items: center; font-weight: 500; border-bottom: 1px dashed #e5e7eb; padding: 6px 0; }
         .proj-number { font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--danger); }
 
-        /* AJUSTES NIVEL PRO: BUSINESS IMPACT */
         .business-impact { background: transparent; border: none; padding: 0; margin-bottom: 25px; text-align: center; }
         .business-impact h3 { font-size: 11px; color: var(--primary); text-transform: uppercase; margin-bottom: 6px; }
         .business-impact p { font-size: 14px; color: var(--text); font-weight: 700; line-height: 1.3; }
 
-        /* AJUSTES NIVEL PRO: PRE-CTA MESSAGE */
         .pre-cta-msg { font-size: 12px; color: #6b7280; text-align: center; margin-bottom: 12px; font-weight: 500; }
 
         .lead-form { background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 16px; }
@@ -222,7 +219,6 @@
             const temVal = (tnaVal / 365) * 30; 
             const teaVal = (Math.pow(1 + (temVal / 100), 365 / 30) - 1) * 100;
 
-            // AJUSTE NIVEL PRO: HTML DE TASA
             document.getElementById('label-tasas').innerHTML = `
             Tasa activa de referencia (BNA / mercado)<br>
             <span style="font-size:11px; font-weight:600; color:#4b5563; text-transform:none;">
@@ -349,7 +345,68 @@
             });
         } catch (e) { console.log("Error al capturar lead"); }
 
-        const msg = encodeURIComponent(`Hola Mariano, soy ${nombre}. La auditoría de MB Capital me indica un ${scoreTexto} con una pérdida de ${totalPerdida}. Necesito tu ayuda para cobrar esto.`);
+        // EXTRACCIÓN DE NUEVAS VARIABLES PARA EL MENSAJE
+        const diasTexto = document.getElementById('dias-transcurridos').innerText;
+        const perdidaDiariaTexto = document.getElementById('perdida-diaria').innerText;
+
+        // NORMALIZACIÓN DEL SCORE
+        let urgenciaTag = "";
+        if (scoreTexto.toLowerCase().includes("bajo")) urgenciaTag = "🟢 BAJO";
+        else if (scoreTexto.toLowerCase().includes("moderado")) urgenciaTag = "🟡 MODERADO";
+        else if (scoreTexto.toLowerCase().includes("alto")) urgenciaTag = "🟠 ALTO";
+        else urgenciaTag = "🔴 CRÍTICO";
+
+        // ARMADO DEL MENSAJE FINAL
+        let mensajeFinal = "";
+
+        if (urgenciaTag.includes("BAJO")) {
+            mensajeFinal = `Hola Mariano, soy ${nombre}.
+Estoy analizando un caso con impacto bajo.
+
+📊 Capital: ${montoVal}
+💸 Pérdida actual: ${totalPerdida}
+${diasTexto}
+
+Quiero ordenarlo antes de que crezca.`;
+        }
+        else if (urgenciaTag.includes("MODERADO")) {
+            mensajeFinal = `Hola Mariano, soy ${nombre}.
+
+Tengo una situación que ya empieza a impactar en la rentabilidad.
+
+📊 Capital: ${montoVal}
+💸 Pérdida: ${totalPerdida}
+${diasTexto}
+${perdidaDiariaTexto}
+
+Quiero ver cómo recuperarlo.`;
+        }
+        else if (urgenciaTag.includes("ALTO")) {
+            mensajeFinal = `Hola Mariano, soy ${nombre}.
+
+Estoy absorbiendo un costo financiero importante por no cobrar.
+
+📊 Capital: ${montoVal}
+💸 Pérdida: ${totalPerdida}
+${diasTexto}
+${perdidaDiariaTexto}
+
+Necesito ayuda para recuperar esto.`;
+        }
+        else {
+            mensajeFinal = `Hola Mariano, soy ${nombre}.
+
+Tengo un caso crítico.
+
+📊 Capital: ${montoVal}
+💸 Pérdida acumulada: ${totalPerdida}
+${diasTexto}
+${perdidaDiariaTexto}
+
+Esto ya me está generando una pérdida real. Necesito resolverlo urgente.`;
+        }
+
+        const msg = encodeURIComponent(mensajeFinal);
         window.location.href = `https://wa.me/5491166463800?text=${msg}`;
     }
 </script>
