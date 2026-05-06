@@ -1,323 +1,311 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Auditoría de Fuga Patrimonial - MB Capital</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Auditoría de Fuga Patrimonial - MB Capital</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --primary: #58a6ff;
+            --danger: #f85149;
+            --warning: #f1e05a;
+            --success: #238636;
+            --text: #c9d1d9;
+            --text-dim: #8b949e;
+        }
 
-<style>
-:root {
-    --bg:#0d1117;
-    --surface:#161b22;
-    --primary:#58a6ff;
-    --danger:#f85149;
-    --warning:#f1e05a;
-    --success:#238636;
-    --text:#c9d1d9;
-    --text-dim:#8b949e;
-}
+        /* Reset crítico para evitar desbordamientos */
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0;
+            -webkit-tap-highlight-color: transparent; 
+        }
 
-*{box-sizing:border-box;margin:0;padding:0}
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            padding: 15px; 
+            line-height: 1.5;
+            overflow-x: hidden; /* Evita scroll horizontal */
+        }
 
-body{
-    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto;
-    background:var(--bg);
-    color:var(--text);
-    padding:15px;
-}
+        .container { 
+            width: 100%; 
+            max-width: 450px; 
+            margin: 0 auto; 
+        }
+        
+        /* HERO SECTION */
+        .hero { text-align: center; padding: 25px 0 20px; }
+        .hero h1 { font-size: 22px; color: #fff; margin-bottom: 10px; line-height: 1.2; }
+        .hero p { color: var(--warning); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-.container{max-width:420px;margin:auto}
+        /* CALCULADORA CARD */
+        .audit-card { 
+            background: var(--surface); 
+            border: 1px solid #30363d; 
+            border-radius: 12px; 
+            padding: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%; /* Asegura que no sea más ancha que el padre */
+        }
+        
+        .input-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; /* Por defecto 2 columnas */
+            gap: 12px; 
+            margin-top: 10px; 
+        }
+        
+        .full-width { grid-column: span 2; }
 
-.hero{text-align:center;margin-bottom:20px}
-.hero h1{font-size:22px;color:#fff;margin-bottom:8px}
-.hero p{font-size:12px;color:var(--text-dim)}
+        .field { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+        label { font-size: 9px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        input { 
+            background: #0d1117; 
+            border: 1px solid #30363d; 
+            color: #fff; 
+            padding: 12px; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            width: 100%; /* Crucial: el input nunca desborda su columna */
+            outline: none;
+        }
+        
+        /* Ajuste para móviles muy angostos */
+        @media (max-width: 360px) {
+            .input-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .hero h1 { font-size: 20px; }
+        }
 
-.card{
-    background:var(--surface);
-    border:1px solid #30363d;
-    border-radius:12px;
-    padding:20px;
-}
+        .btn-main { 
+            width: 100%; 
+            background: var(--primary); 
+            color: #fff; 
+            border: none; 
+            padding: 16px; 
+            border-radius: 8px; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            margin-top: 20px; 
+            font-size: 13px;
+        }
+        
+        /* DASHBOARD RESULTS */
+        .dashboard { display: none; margin-top: 25px; border-top: 1px solid #30363d; padding-top: 20px; }
+        
+        .total-box { 
+            background: rgba(88, 166, 255, 0.08); 
+            border: 1px solid var(--primary); 
+            border-radius: 10px; 
+            padding: 15px; 
+            text-align: center; 
+            margin-bottom: 20px; 
+        }
+        .total-box span { display: block; font-size: 10px; font-weight: 800; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; }
+        .total-amount { font-size: 24px; font-weight: 800; color: #fff; font-family: monospace; word-break: break-all; }
 
-.field{margin-bottom:12px}
-label{font-size:10px;color:var(--text-dim);display:block;margin-bottom:4px}
+        .projection-box { background: rgba(248, 81, 73, 0.08); border: 1px solid rgba(248, 81, 73, 0.15); border-radius: 10px; padding: 15px; margin: 20px 0; }
+        .projection-title { font-size: 10px; font-weight: 800; color: var(--warning); display: block; margin-bottom: 12px; text-transform: uppercase; text-align: center; }
+        .projection-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 11px; align-items: center; gap: 5px; }
 
-input{
-    width:100%;
-    padding:12px;
-    background:#0d1117;
-    border:1px solid #30363d;
-    border-radius:8px;
-    color:#fff;
-}
+        .business-impact { background: #1c2128; border-left: 4px solid var(--primary); padding: 15px; margin-bottom: 25px; border-radius: 4px; }
+        .business-impact h3 { font-size: 11px; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; }
+        .business-impact p { font-size: 13px; color: #fff; font-weight: 700; }
 
-button{
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:8px;
-    font-weight:700;
-    cursor:pointer;
-}
+        /* LEYENDA FINAL REPARADA */
+        .mind-break-container { 
+            margin: 25px 0; 
+            padding: 15px; 
+            border-top: 1px solid #30363d; 
+            border-bottom: 1px solid #30363d; 
+            text-align: center;
+            width: 100%;
+        }
+        .mind-break-text { color: #fff; font-size: 15px; font-weight: 700; margin-bottom: 5px; }
+        .mind-break-sub { color: var(--warning); font-size: 13px; font-weight: 500; }
 
-.btn-main{background:var(--primary);color:#fff;margin-top:10px}
+        .lead-form { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; border: 1px solid #30363d; margin-bottom: 15px; width: 100%; }
+        .lead-form h4 { font-size: 11px; color: var(--primary); text-transform: uppercase; text-align: center; margin-bottom: 15px; }
 
-.dashboard{display:none;margin-top:20px}
-
-.total{
-    font-size:26px;
-    font-weight:800;
-    text-align:center;
-    margin-bottom:15px;
-}
-
-.box{
-    background:#1c2128;
-    padding:15px;
-    border-radius:8px;
-    margin-bottom:12px;
-}
-
-.warn{color:var(--danger);font-weight:700}
-
-.whatsapp{
-    background:var(--success);
-    color:#fff;
-    margin-top:10px;
-}
-</style>
+        .whatsapp-btn { width: 100%; background: var(--success); color: #fff; border: none; padding: 16px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 14px; cursor: pointer; }
+        .response-time { display: block; text-align: center; font-size: 10px; color: var(--text-dim); margin-top: 10px; font-weight: 700; }
+        
+        .footer { text-align: center; font-size: 9px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #30363d; color: var(--text-dim); }
+        .footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
+    </style>
 </head>
-
 <body>
 
 <div class="container">
+    <section class="hero">
+        <h1>Estás financiando a tus clientes sin darte cuenta</h1>
+        <p>TU CLIENTE USA TU PLATA GRATIS. DEJÁ DE FINANCIAR SU NEGOCIO.</p>
+    </section>
 
-<div class="hero">
-<h1>Tu cliente está usando tu capital</h1>
-<p>Calculá el costo financiero real de no cobrar a tiempo</p>
-</div>
+    <div class="audit-card">
+        <div class="input-grid">
+            <div class="field full-width">
+                <label>Capital Adeudado (ARS)</label>
+                <input type="number" id="monto" placeholder="Ej: 50000000" inputmode="decimal">
+            </div>
+            <div class="field">
+                <label>Vencimiento</label>
+                <input type="date" id="fechaVenc">
+            </div>
+            <div class="field">
+                <label>Auditoría</label>
+                <input type="date" id="fechaCorte">
+            </div>
+            <div class="field">
+                <label>Margen Neto (%)</label>
+                <input type="number" id="margen" value="20" inputmode="decimal">
+            </div>
+            <div class="field">
+                <label id="label-tasas">CFT % BNA</label>
+                <input type="number" id="tna" value="94.42" oninput="updateTeaLabel()" inputmode="decimal">
+            </div>
+        </div>
+        <button class="btn-main" onclick="startAudit()">Auditar pérdida ahora</button>
 
-<div class="card">
+        <div id="dashboard" class="dashboard">
+            <div class="total-box">
+                <span>💸 PLATA QUE YA PERDISTE:</span>
+                <div id="cont-total" class="total-amount"></div>
+            </div>
 
-<div class="field">
-<label>Monto adeudado</label>
-<input type="number" id="monto">
-</div>
+            <div class="projection-box">
+                <span class="projection-title">🔥 EL TIEMPO JUEGA EN TU CONTRA:</span>
+                <div class="projection-row">
+                    <span>En 30 días habrás perdido:</span>
+                    <span id="proj-30" style="color:var(--danger); font-weight:700;"></span>
+                </div>
+                <div class="projection-row">
+                    <span>En 60 días habrás perdido:</span>
+                    <span id="proj-60" style="color:var(--danger); font-weight:700;"></span>
+                </div>
+                <div class="projection-row">
+                    <span>En 90 días habrás perdido:</span>
+                    <span id="proj-90" style="color:var(--danger); font-weight:700;"></span>
+                </div>
+            </div>
 
-<div class="field">
-<label>Fecha de vencimiento</label>
-<input type="date" id="fecha">
-</div>
+            <div class="business-impact">
+                <h3>Esfuerzo Comercial:</h3>
+                <p id="extra-ventas"></p>
+                <div id="explicacion-impacto" style="font-size: 10px; color: var(--text-dim); margin-top: 8px; line-height: 1.4;"></div>
+            </div>
 
-<div class="field">
-<label id="label-tasa">Cargando tasa...</label>
-<input type="number" id="tna">
-</div>
+            <div class="mind-break-container">
+                <div class="mind-break-text">El problema no es la mora.</div>
+                <div class="mind-break-sub">Es capital que desaparece de tu patrimonio.</div>
+            </div>
 
-<div class="field">
-<label>Margen neto (%)</label>
-<input type="number" id="margen" value="20">
-</div>
+            <div class="lead-form">
+                <h4>Detener este quebranto</h4>
+                <div class="field" style="margin-bottom:10px;"><label>Nombre</label><input type="text" id="lead-nombre" placeholder="Tu nombre"></div>
+                <div class="field" style="margin-bottom:10px;"><label>Empresa</label><input type="text" id="lead-empresa" placeholder="Empresa"></div>
+                <div class="field"><label>Email</label><input type="email" id="lead-email" placeholder="mail@empresa.com"></div>
+            </div>
 
-<button class="btn-main" onclick="calcular()">Calcular impacto</button>
+            <button class="whatsapp-btn" onclick="sendWA()">Ayudame a cobrar esto</button>
+            <span class="response-time">TE RESPONDO EN MENOS DE 1 HORA</span>
+        </div>
+    </div>
 
-<div id="dashboard" class="dashboard">
-
-<div class="total" id="total"></div>
-
-<div class="box" id="score-box"></div>
-
-<div class="box" id="segmento-box"></div>
-
-<div class="box" id="proyeccion"></div>
-
-<div class="box" id="ventas"></div>
-
-<div class="box warn" id="alerta"></div>
-
-<div style="font-size:11px;color:#8b949e;margin-top:10px;">
-Cálculo basado en tasa activa bancaria sobre saldos vencidos.
-</div>
-
-<button class="whatsapp" onclick="wa()">Analizar este caso</button>
-
-</div>
-
-</div>
-
+    <div class="footer">
+        DESARROLLADO POR <a href="https://www.linkedin.com/in/marianoblumenfeld/" target="_blank">MARIANO BLUMENFELD</a>
+    </div>
 </div>
 
 <script>
+    let timer;
+    let dataInflacionGlobal = [];
+    let ultimaTasaConocida = 0.029;
+    const fmt = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2 });
 
-let timer;
+    window.onload = async function() {
+        document.getElementById('fechaCorte').value = new Date().toISOString().split('T')[0];
+        try {
+            const resI = await fetch('https://api.argentinadatos.com/v1/inflacion');
+            dataInflacionGlobal = await resI.json();
+            if(dataInflacionGlobal.length > 0) ultimaTasaConocida = dataInflacionGlobal[dataInflacionGlobal.length - 1].valor / 100;
+        } catch (e) {}
+        updateTeaLabel();
+    };
 
-const fmt = new Intl.NumberFormat('es-AR',{
-    style:'currency',
-    currency:'ARS'
-});
-
-// =====================
-// TASA DESDE API
-// =====================
-
-let tasaDefault = 120;
-
-window.onload = async function(){
-
-    try{
-        const res = await fetch('https://api.argentinadatos.com/v1/tasas/ba-tasa-activa');
-        const data = await res.json();
-
-        const tasaAPI = data[data.length - 1]?.valor;
-
-        if(tasaAPI){
-            document.getElementById("tna").value = tasaAPI.toFixed(2);
-        } else {
-            document.getElementById("tna").value = tasaDefault;
+    function updateTeaLabel() {
+        const tnaVal = parseFloat(document.getElementById('tna').value);
+        if(!isNaN(tnaVal)) {
+            const teaVal = (Math.pow(1 + (tnaVal / 100 / 12), 12) - 1) * 100;
+            document.getElementById('label-tasas').innerHTML = `CFT: ${tnaVal}% | TEA: ${teaVal.toFixed(1)}%`;
         }
-
-    } catch(e){
-        document.getElementById("tna").value = tasaDefault;
     }
 
-    actualizarEtiquetaTasa();
-};
-
-function actualizarEtiquetaTasa(){
-
-    const tnaVal = parseFloat(document.getElementById("tna").value);
-
-    if(!isNaN(tnaVal)){
-
-        const tea = (Math.pow(1 + (tnaVal/100/12), 12) - 1) * 100;
-
-        document.getElementById("label-tasa").innerText =
-        `TNA: ${tnaVal.toFixed(2)}% | TEA: ${tea.toFixed(1)}%`;
-    }
-}
-
-document.getElementById("tna").addEventListener("input", actualizarEtiquetaTasa);
-
-
-// =====================
-// CÁLCULO
-// =====================
-
-function calcular(){
-
-    clearInterval(timer);
-
-    const monto = parseFloat(document.getElementById("monto").value);
-    const fecha = new Date(document.getElementById("fecha").value);
-    const tna = parseFloat(document.getElementById("tna").value)/100;
-    const margen = parseFloat(document.getElementById("margen").value)/100;
-
-    if(!monto || monto<=0 || isNaN(fecha.getTime()) || tna<=0 || margen<=0){
-        alert("Completá los datos correctamente");
-        return;
+    function getFactorCompuesto(venc, corte) {
+        const dias = (corte - venc) / 86400000;
+        if (dias <= 0) return 1;
+        let factor = 1;
+        dataInflacionGlobal.forEach(entry => {
+            const fMes = new Date(entry.fecha);
+            if (fMes >= new Date(venc.getFullYear(), venc.getMonth(), 1) && fMes <= new Date(corte.getFullYear(), corte.getMonth(), 1)) {
+                factor *= (1 + (entry.valor / 100));
+            }
+        });
+        if (factor === 1) factor = Math.pow(1 + ultimaTasaConocida, dias / 30);
+        return factor;
     }
 
-    document.getElementById("dashboard").style.display="block";
+    function startAudit() {
+        const monto = parseFloat(document.getElementById('monto').value);
+        const fV = new Date(document.getElementById('fechaVenc').value);
+        const inputCorte = new Date(document.getElementById('fechaCorte').value);
+        const tna = parseFloat(document.getElementById('tna').value) / 100;
+        const margen = parseFloat(document.getElementById('margen').value) / 100;
 
-    timer = setInterval(()=>{
+        if(!monto || isNaN(fV.getTime()) || !margen) return alert("Completá todos los datos.");
+        
+        document.getElementById('dashboard').style.display = 'block';
+        window.scrollTo({ top: document.getElementById('dashboard').offsetTop - 20, behavior: 'smooth' });
+        clearInterval(timer);
 
-        const ahora = new Date();
-        const dias = (ahora - fecha)/86400000;
+        timer = setInterval(() => {
+            const ahora = new Date();
+            let tiempoRef = (inputCorte.toDateString() === ahora.toDateString()) ? ahora.getTime() : inputCorte.getTime() + (ahora.getTime() % 5000);
+            const diasExactos = (tiempoRef - fV.getTime()) / 86400000;
+            if (diasExactos < 0) return;
 
-        if(dias <= 0) return;
+            const pFin = monto * (tna / 365) * diasExactos;
+            const factor = getFactorCompuesto(fV, new Date(tiempoRef));
+            const pDev = monto * (factor - 1);
+            const totalActual = pFin + pDev;
+            const costoDiario = totalActual / diasExactos;
 
-        const interes = monto * (tna/365) * dias;
+            document.getElementById('cont-total').innerText = fmt.format(totalActual);
+            document.getElementById('proj-30').innerText = fmt.format(totalActual + (costoDiario * 30));
+            document.getElementById('proj-60').innerText = fmt.format(totalActual + (costoDiario * 60));
+            document.getElementById('proj-90').innerText = fmt.format(totalActual + (costoDiario * 90));
+            
+            const ventaExtra = totalActual / margen; 
+            document.getElementById('extra-ventas').innerText = `Ventas extra necesarias: ${fmt.format(ventaExtra)}`;
+            document.getElementById('explicacion-impacto').innerHTML = `Debés facturar eso para empatar el daño de ${fmt.format(totalActual)}.`;
+        }, 50);
+    }
 
-        document.getElementById("total").innerText = fmt.format(interes);
-
-        // SCORE
-        const ratio = interes / monto;
-
-        let score = "";
-        let color = "";
-
-        if (ratio < 0.02){
-            score = "BAJA";
-            color = "#238636";
-        } else if (ratio < 0.05){
-            score = "MEDIA";
-            color = "#f1e05a";
-        } else {
-            score = "ALTA";
-            color = "#f85149";
-        }
-
-        document.getElementById("score-box").innerHTML =
-        `<b>Nivel de urgencia:</b> 
-        <span style="color:${color}; font-weight:700;">${score}</span><br>
-        <span style="font-size:12px; color:#8b949e;">
-        La pérdida ya representa el ${(ratio*100).toFixed(2)}% del capital.
-        </span>`;
-
-        // SEGMENTACIÓN
-        let mensaje = "";
-
-        if (ratio < 0.02){
-            mensaje = "Todavía estás a tiempo de corregir esto sin impacto relevante.";
-        } else if (ratio < 0.05){
-            mensaje = "Esto ya empieza a afectar tu rentabilidad.";
-        } else if (ratio < 0.1){
-            mensaje = "Esto está deteriorando tu resultado financiero.";
-        } else {
-            mensaje = "Esto ya es una pérdida significativa de patrimonio.";
-        }
-
-        document.getElementById("segmento-box").innerText = mensaje;
-
-        // PROYECCIÓN
-        const interes30 = interes + (monto * (tna/365) * 30);
-        const interes60 = interes + (monto * (tna/365) * 60);
-        const interes90 = interes + (monto * (tna/365) * 90);
-
-        document.getElementById("proyeccion").innerHTML =
-        `<b>Proyección:</b><br>
-        30 días: ${fmt.format(interes30)}<br>
-        60 días: ${fmt.format(interes60)}<br>
-        90 días: ${fmt.format(interes90)}`;
-
-        // IMPACTO COMERCIAL
-        const ventas = interes / margen;
-
-        document.getElementById("ventas").innerText =
-        `Necesitás facturar ${fmt.format(ventas)} para recuperar esta pérdida.`;
-
-        // ALERTA
-        if(interes >= monto * 0.05){
-            document.getElementById("alerta").innerText =
-            "La pérdida ya supera el 5% del capital. Esto dejó de ser un atraso operativo.";
-        } else {
-            document.getElementById("alerta").innerText = "";
-        }
-
-    },1000);
-}
-
-
-// =====================
-// WHATSAPP
-// =====================
-
-function wa(){
-
-    const total = document.getElementById("total").innerText;
-
-    const msg = encodeURIComponent(
-`Hola, analicé una deuda con la herramienta de MB Capital.
-
-La pérdida estimada es ${total}.
-
-Quiero evaluar cómo resolver esto.`
-    );
-
-    window.location.href = `https://wa.me/5491166463800?text=${msg}`;
-}
-
+    function sendWA() {
+        const nombre = document.getElementById('lead-nombre').value;
+        const empresa = document.getElementById('lead-empresa').value;
+        const totalPerdida = document.getElementById('cont-total').innerText;
+        if(!nombre || !empresa) return alert("Completá tus datos para continuar.");
+        const msg = encodeURIComponent(`Hola Mariano, soy ${nombre} de ${empresa}. La auditoría de MB Capital me mostró una pérdida de ${totalPerdida}. Ayudame a cobrar esto.`);
+        window.location.href = `https://wa.me/5491166463800?text=${msg}`;
+    }
 </script>
-
 </body>
 </html>
